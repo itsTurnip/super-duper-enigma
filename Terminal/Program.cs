@@ -6,11 +6,11 @@ using System.Threading.Tasks;
 
 namespace Terminal
 {
-    class Program
+    internal class Program
     {
-        static void Main(string[] args)
+        private static void Main(string[] args)
         {
-            Console.ReadLine();
+            MMF.CheckMMF();
         }
     }
 }
