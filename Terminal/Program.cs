@@ -10,7 +10,7 @@ namespace Terminal
     {
         static void Main(string[] args)
         {
-            Console.ReadLine();
+            MMF.CheckMMF();
         }
     }
 }
