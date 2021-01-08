@@ -1,8 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using ConsoleLib;
 
 namespace Terminal
 {
@@ -10,7 +7,10 @@ namespace Terminal
     {
         static void Main(string[] args)
         {
-            Console.ReadLine();
+            ConsoleMan man = new ConsoleMan();
+            foreach (string el in "I like this shit but it's really hard".Split())
+                man.WindowList.Add(el);
+            man.Loop();
         }
     }
 }
