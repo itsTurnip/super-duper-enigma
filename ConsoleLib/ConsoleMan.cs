@@ -60,13 +60,13 @@ namespace ConsoleLib
             Console.ForegroundColor = foregroundColor;
             Console.BackgroundColor = backgroundColor;
             if (arg != null)
-                Console.WriteLine(obj.ToString() + new string(' ', width - len), arg);
+                Console.Write(obj.ToString() + new string(' ', width - len), arg);
             else
-                Console.WriteLine(obj.ToString() + new string(' ', width - len));
+                Console.Write(obj.ToString() + new string(' ', width - len));
         }
         void Write(object obj, object[] arg = null)
         {
-            Write(obj, ConsoleColor.Gray, ConsoleColor.Black, arg); ;
+            Write(obj, ConsoleColor.Gray, ConsoleColor.Black, arg);
         }
         void Write(object obj, ConsoleColor foregroundColor, ConsoleColor backgroundColor, object[] arg = null)
         {
@@ -82,7 +82,7 @@ namespace ConsoleLib
             if (next)
             {
                 selectedIndex += 1;
-                if (selectedIndex == WindowList.Count)
+                if (selectedIndex >= WindowList.Count)
                     selectedIndex = 0;
             } else
             {
@@ -95,9 +95,9 @@ namespace ConsoleLib
         {
             Console.CursorVisible = false;
             int height = Console.WindowHeight;
-            
-            //int topBorder = 0;
-            int bottomBorder = height - 2;
+            int width = Console.WindowWidth;
+            // int topBorder = 0;
+            int bottomBorder = height - 1;
             Console.SetCursorPosition(0, 0);
             int i = 0;
             while (i < bottomBorder && i < WindowList.Count)
@@ -108,7 +108,6 @@ namespace ConsoleLib
                 else
                     WriteLine(WindowList[i]);
                 i++;
-                
             }
             while (i < bottomBorder)
             {
@@ -116,7 +115,9 @@ namespace ConsoleLib
                 WriteLine("");
                 i++;
             }
-            Console.SetCursorPosition(0, bottomBorder + 1);
+            Console.SetCursorPosition(0, i);
+            Write(new string(' ', width - 1));
+            Console.SetCursorPosition(0, bottomBorder);
             Write("Esc");
             Write("Exit", ConsoleColor.Black, ConsoleColor.Gray);
             Write("\tUp");
@@ -146,6 +147,7 @@ namespace ConsoleLib
                     KeyPressed?.Invoke(new KeyPressedEvent(this, cki.Key));
                 }
                 Render();
+                Thread.Sleep(10);
             }
         }
         ~ConsoleMan()
