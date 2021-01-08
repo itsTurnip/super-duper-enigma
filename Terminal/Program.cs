@@ -1,16 +1,16 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using ConsoleLib;
 
 namespace Terminal
 {
-    internal class Program
+    class Program
     {
-        private static void Main(string[] args)
+        static void Main(string[] args)
         {
-            MMF.CheckMMF();
+            ConsoleMan man = new ConsoleMan();
+            foreach (string el in "I like this shit but it's really hard".Split())
+                man.WindowList.Add(el);
+            man.Loop();
         }
     }
 }
