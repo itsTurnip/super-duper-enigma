@@ -42,17 +42,12 @@ namespace ConsoleLib
                 return null;
             }
         }
-        public ConsoleColor SelectionBackground { get => selectionBackground; set => selectionBackground = value; }
-        ConsoleColor selectionBackground = ConsoleColor.Gray;
-        public ConsoleColor SelectionForeground { get => selectionForeground; set => selectionForeground = value; }
-        ConsoleColor selectionForeground = ConsoleColor.Black;
-        
-        public ConsoleColor DefaultBackground { get => defaultBackground; set => defaultBackground = value; }
-        ConsoleColor defaultBackground = ConsoleColor.Black;
-        
-        public ConsoleColor DefaultForeground { get => defaultForeground; set => defaultForeground = value; }
+        public ConsoleColor SelectionBackground { get; set; } = ConsoleColor.Gray;
+        public ConsoleColor SelectionForeground { get; set; } = ConsoleColor.Black;
 
-        ConsoleColor defaultForeground = ConsoleColor.Gray;
+        public ConsoleColor DefaultBackground { get; set; } = ConsoleColor.Black;
+
+        public ConsoleColor DefaultForeground { get; set; } = ConsoleColor.Gray;
 
         public ConsoleMan()
         {
@@ -67,7 +62,7 @@ namespace ConsoleLib
         }
         void WriteLine(object obj, int line = -1, object[] arg = null)
         {
-            WriteLine(obj, defaultForeground, defaultBackground, line, arg);
+            WriteLine(obj, DefaultForeground, DefaultBackground, line, arg);
         }
         void WriteLine(object obj, ConsoleColor foregroundColor, ConsoleColor backgroundColor, int line = -1, object[] arg = null)
         {
@@ -140,7 +135,7 @@ namespace ConsoleLib
             {
                 index = i + visibleTop;
                 if (index == selectedIndex)
-                    WriteLine(WindowList[index], selectionForeground, selectionBackground, i);
+                    WriteLine(WindowList[index], SelectionForeground, SelectionBackground, i);
                 else
                     WriteLine(WindowList[index], i);
                 
@@ -154,17 +149,17 @@ namespace ConsoleLib
             Write(new string(' ', width - 1));
             Console.SetCursorPosition(0, bottomBorder);
             Write("Esc");
-            Write("Exit", selectionForeground, selectionBackground);
+            Write("Exit", SelectionForeground, SelectionBackground);
             Write("\tUp");
-            Write("Previous", selectionForeground, selectionBackground);
+            Write("Previous", SelectionForeground, SelectionBackground);
             Write("\tDown");
-            Write("Next", selectionForeground, selectionBackground);
+            Write("Next", SelectionForeground, SelectionBackground);
             Write("\tBot");
-            Write($"{visibleBottom}", selectionForeground, selectionBackground);
+            Write($"{visibleBottom}", SelectionForeground, SelectionBackground);
             Write("\tTop");
-            Write($"{visibleTop}", selectionForeground, selectionBackground);
+            Write($"{visibleTop}", SelectionForeground, SelectionBackground);
             Write("\tSel");
-            Write($"{selectedIndex}", selectionForeground, selectionBackground);
+            Write($"{selectedIndex}", SelectionForeground, SelectionBackground);
         }
         public void Loop()
         {
