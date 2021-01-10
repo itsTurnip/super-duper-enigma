@@ -1,7 +1,5 @@
 ﻿using System;
 using System.Runtime.InteropServices;
-using System.Diagnostics;
-using System.ComponentModel;
 using System.Collections.ObjectModel;
 using System.IO;
 using Microsoft.Win32.SafeHandles;
@@ -17,6 +15,7 @@ namespace ConsoleLib
     }
     public class ConsoleMan
     {
+        
         [DllImport("kernel32.dll", SetLastError = true)]
         static extern bool AllocConsole();
 
@@ -34,6 +33,9 @@ namespace ConsoleLib
 
         int selectedIndex = -1;
         bool stop = false;
+        public string Title { get; set; } = "Terminal";
+        string message;
+        ConsoleColor messageColor = ConsoleColor.DarkRed;
         public object SelectedItem { 
             get
             {
@@ -68,14 +70,15 @@ namespace ConsoleLib
         {
             if(line >= 0)
                 Console.SetCursorPosition(0, line);
+            int cursor = Console.CursorLeft;
             int width = Console.WindowWidth;
             int len = obj.ToString().Length;
             Console.ForegroundColor = foregroundColor;
             Console.BackgroundColor = backgroundColor;
             if (arg != null)
-                Console.Write(obj.ToString() + new string(' ', width - len), arg);
+                Console.Write(obj.ToString() + new string(' ', width - cursor - len), arg);
             else
-                Console.Write(obj.ToString() + new string(' ', width - len));
+                Console.Write(obj.ToString() + new string(' ', width - cursor - len));
         }
         void Write(object obj, object[] arg = null)
         {
@@ -104,50 +107,30 @@ namespace ConsoleLib
                     selectedIndex = WindowList.Count - 1;
             }
         }
-        public void Render()
+        public void ShowMessage(string message)
         {
-            Console.CursorVisible = false;
-            int height = Console.WindowHeight;
-            int width = Console.WindowWidth;
-            int bottomBorder = height - 1;
-            int i = 0;
-
-            int visibleArea = visibleBottom - visibleTop;
-            if (visibleArea != bottomBorder - 1)
-                visibleBottom = visibleTop + bottomBorder - 1;
-
-            if (selectedIndex >= 0)
-            {
-                if (selectedIndex < visibleTop)
-                {
-                    int diff = visibleTop - selectedIndex;
-                    visibleTop -= diff;
-                    visibleBottom -= diff;
-                } else if (selectedIndex > visibleBottom)
-                {
-                    int diff = selectedIndex - visibleBottom;
-                    visibleTop += diff;
-                    visibleBottom += diff;
-                }
-            }
-
-            for (int index = i + visibleTop; index < visibleBottom && i < WindowList.Count; i++)
-            {
-                index = i + visibleTop;
-                if (index == selectedIndex)
-                    WriteLine(WindowList[index], SelectionForeground, SelectionBackground, i);
-                else
-                    WriteLine(WindowList[index], i);
-                
-            }
-            while (i < bottomBorder)
-            {
-                WriteLine("", i);
-                i++;
-            }
-            Console.SetCursorPosition(0, i);
-            Write(new string(' ', width - 1));
-            Console.SetCursorPosition(0, bottomBorder);
+            this.message = message;
+        }
+        public void ShowMessage(string message, ConsoleColor color)
+        {
+            messageColor = color;
+            ShowMessage(message);
+        }
+        const int headerHeight = 2;
+        void renderHead()
+        {
+            Console.SetCursorPosition(0, 0);
+            Write($"{Title}\t", SelectionForeground, SelectionBackground);
+            if (message != null)
+                WriteLine(message, messageColor, SelectionBackground);
+            else
+                WriteLine("", messageColor, SelectionBackground);
+        }
+        const int footerHeight = 2;
+        void renderFooter()
+        {
+            int bottomline = Console.WindowHeight - 1;
+            Console.SetCursorPosition(0, bottomline);
             Write("Esc");
             Write("Exit", SelectionForeground, SelectionBackground);
             Write("\tUp");
@@ -161,9 +144,59 @@ namespace ConsoleLib
             Write("\tSel");
             Write($"{selectedIndex}", SelectionForeground, SelectionBackground);
         }
+        void renderList()
+        {
+            int height = Console.WindowHeight - 1;
+
+            int visibleArea = visibleBottom - visibleTop;
+            if (visibleArea != height - footerHeight - 1)
+            {
+                visibleBottom = visibleTop + height - footerHeight - 1;
+                Console.WriteLine("", visibleBottom);
+            }
+
+            if (selectedIndex >= 0)
+            {
+                if (selectedIndex < visibleTop)
+                {
+                    int diff = visibleTop - selectedIndex;
+                    visibleTop -= diff;
+                    visibleBottom -= diff;
+                }
+                else if (selectedIndex >= visibleBottom)
+                {
+                    int diff = selectedIndex - visibleBottom + 1;
+                    visibleTop += diff;
+                    visibleBottom += diff;
+                }
+            }
+            int line = headerHeight;
+            int index = visibleTop;
+            while (index < visibleBottom && index < WindowList.Count)
+            {
+                if (index == selectedIndex)
+                    WriteLine(WindowList[index], SelectionForeground, SelectionBackground, line);
+                else
+                    WriteLine(WindowList[index], line);
+                line++;
+                index++;
+            }
+            while (line < height)
+            {
+                WriteLine("", line);
+                line++;
+            }
+        }
+        void renderFull()
+        {
+            Console.CursorVisible = false;
+            renderHead();
+            renderList();
+            renderFooter();
+        }
         public void Loop()
         {
-            visibleBottom = Console.WindowHeight - 2;
+            visibleBottom = Console.WindowHeight - 3;
             while(!stop)
             {
                 if (Console.KeyAvailable)
@@ -183,7 +216,7 @@ namespace ConsoleLib
                     }
                     KeyPressed?.Invoke(new KeyPressedEvent(this, cki.Key));
                 }
-                Render();
+                renderFull();
                 //Thread.Sleep(10);
             }
         }
