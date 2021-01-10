@@ -7,11 +7,13 @@ namespace Terminal
 {
     internal class MMF
     {
-        public static void CheckMMF()
+        private MemoryMappedFile mmFile;
+
+        public void CheckMMF()
         {
             try
             {
-                using (var mmCheckFile = MemoryMappedFile.OpenExisting("MMF.mmf"))
+                using (var mmCheckFile = MemoryMappedFile.OpenExisting("CheckLoad", MemoryMappedFileRights.FullControl, HandleInheritability.Inheritable))
                 {
                     using (var mmAccessor = mmCheckFile.CreateViewAccessor())
                     {
@@ -28,7 +30,8 @@ namespace Terminal
             }
             catch (FileNotFoundException)
             {
-                var mmFile = MemoryMappedFile.CreateNew(@"MMF.mmf", 12);
+                mmFile = MemoryMappedFile.CreateNew("CheckLoad", 12, MemoryMappedFileAccess.ReadWrite, MemoryMappedFileOptions.DelayAllocatePages, HandleInheritability.None);
+
                 using (var mmfAccessor = mmFile.CreateViewAccessor())
                 {
                     var valueToWrite = "Hello world!";
@@ -37,7 +40,7 @@ namespace Terminal
             }
         }
 
-        private static void Tree()
+        private void Tree()
         {
             int[] beeps = new int[] { 247, 417, 417, 370, 417, 329, 247, 247, 247, 417, 417, 370, 417, 497, 497, 277, 277, 440, 440, 417, 370, 329, 247, 417, 417, 370, 417, 329 };
             for (int i = 0; i < beeps.Length; ++i)
