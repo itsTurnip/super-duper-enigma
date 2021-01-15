@@ -13,7 +13,11 @@ namespace Terminal
             MMF mmf = new MMF();
             mmf.CheckMMF();
             man.ShowMessage("Bullshit happens");
-
+            man.Keys.AddRange(new MenuKeyInfo[] { new MenuKeyInfo() 
+            { 
+                Key = "P",
+                Description = "Setting"
+            }});
             man.Loop();
         }
     }

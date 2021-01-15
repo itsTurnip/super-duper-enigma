@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Runtime.InteropServices;
-using System.Collections.ObjectModel;
 using System.IO;
 using Microsoft.Win32.SafeHandles;
+using System.Collections.Generic;
 using System.Threading;
 
 namespace ConsoleLib
@@ -30,7 +30,7 @@ namespace ConsoleLib
 
         private int visibleTop = 0;
         private int visibleBottom = 0;
-        public ObservableCollection<object> WindowList { get; }
+        public List<object> WindowList { get; } = new List<object>();
 
         public event KeyPressedEventHandler KeyPressed;
 
@@ -56,10 +56,10 @@ namespace ConsoleLib
         public ConsoleColor DefaultBackground { get; set; } = ConsoleColor.Black;
 
         public ConsoleColor DefaultForeground { get; set; } = ConsoleColor.Gray;
+        public List<MenuKeyInfo> Keys { get; } = new List<MenuKeyInfo>();
 
         public ConsoleMan()
         {
-            WindowList = new ObservableCollection<object>();
             if (!AllocConsole())
                 throw new Exception();
             IntPtr input = GetStdHandle(StdHandle.Input);
@@ -83,10 +83,12 @@ namespace ConsoleLib
             int len = obj.ToString().Length;
             Console.ForegroundColor = foregroundColor;
             Console.BackgroundColor = backgroundColor;
-            if (arg != null)
-                Console.Write(obj.ToString() + new string(' ', width - cursor - len), arg);
-            else
-                Console.Write(obj.ToString() + new string(' ', width - cursor - len));
+            int spaces = width - cursor - len;
+            if (spaces > 0)
+                if (arg != null)
+                    Console.Write(obj.ToString() + new string(' ', width - cursor - len), arg);
+                else
+                    Console.Write(obj.ToString() + new string(' ', width - cursor - len));
         }
 
         private void Write(object obj, object[] arg = null)
@@ -141,7 +143,7 @@ namespace ConsoleLib
                 WriteLine(message, messageColor, SelectionBackground);
             else
                 WriteLine("", messageColor, SelectionBackground);
-            WriteLine("");
+            WriteLine("", 1);
         }
 
         private const int footerHeight = 2;
@@ -162,25 +164,28 @@ namespace ConsoleLib
             Write($"{visibleTop}", SelectionForeground, SelectionBackground);
             Write("\tSel");
             Write($"{selectedIndex}", SelectionForeground, SelectionBackground);
+            foreach(MenuKeyInfo keyInfo in Keys)
+            {
+                Write($"\t{keyInfo.Key}");
+                Write($"{keyInfo.Description}", SelectionForeground, SelectionBackground);
+            }
             var pos = Console.CursorLeft;
             var width = Console.WindowWidth;
             if (width > pos)
-            {
                 Write(new string(' ', width - pos - 1));
-            }
         }
 
         private void renderList()
         {
             int height = Console.WindowHeight - 1;
-
             int visibleArea = visibleBottom - visibleTop;
+            
             if (visibleArea != height - footerHeight - 1)
             {
                 visibleBottom = visibleTop + height - footerHeight - 1;
                 Console.WriteLine("", visibleBottom);
             }
-
+            
             if (selectedIndex >= 0)
             {
                 if (selectedIndex < visibleTop)
@@ -196,6 +201,8 @@ namespace ConsoleLib
                     visibleBottom += diff;
                 }
             }
+            if (visibleArea <= 0)
+                return;
             int line = headerHeight;
             int index = visibleTop;
             while (index < visibleBottom && index < WindowList.Count)
@@ -217,6 +224,8 @@ namespace ConsoleLib
         private void renderFull()
         {
             Console.CursorVisible = false;
+            if (Console.WindowHeight - footerHeight <= 0)
+                return;
             renderHead();
             renderList();
             renderFooter();
