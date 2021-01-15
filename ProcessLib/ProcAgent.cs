@@ -4,14 +4,18 @@ using System.Runtime.InteropServices;
 namespace ProcessLib
 {
     [ComVisible(true)]
-    [Guid("fa578469-f3fa-4f44-bd94-81c1e759e56c")]
+    [Guid("7b1b3989-054f-406a-91c9-96ed7104f7d9")]
     [ClassInterface(ClassInterfaceType.AutoDual)]
     public class ProcAgent
     {
         public int ProcId { get; }
-        public ProcAgent(int procId)
+        public ProcAgent()
         {
-            ProcId = procId;
+
+        }
+        public double RetDoub()
+        {
+            return 5.0;
         }
     }
 }
