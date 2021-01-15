@@ -13,37 +13,43 @@ namespace ConsoleLib
         Output,
         Input
     }
+
     public class ConsoleMan
     {
-        
         [DllImport("kernel32.dll", SetLastError = true)]
-        static extern bool AllocConsole();
+        private static extern bool AllocConsole();
 
         [DllImport("kernel32.dll", SetLastError = true)]
-        static extern bool FreeConsole();
-        [DllImport("kernel32.dll", SetLastError = true)]
-        static extern bool AttachConsole(int id);
-        [DllImport("kernel32.dll", SetLastError = true)]
-        static extern IntPtr GetStdHandle(StdHandle std);
+        private static extern bool FreeConsole();
 
-        int visibleTop = 0;
-        int visibleBottom = 0;
+        [DllImport("kernel32.dll", SetLastError = true)]
+        private static extern bool AttachConsole(int id);
+
+        [DllImport("kernel32.dll", SetLastError = true)]
+        private static extern IntPtr GetStdHandle(StdHandle std);
+
+        private int visibleTop = 0;
+        private int visibleBottom = 0;
         public ObservableCollection<object> WindowList { get; }
+
         public event KeyPressedEventHandler KeyPressed;
 
-        int selectedIndex = -1;
-        bool stop = false;
+        private int selectedIndex = -1;
+        private bool stop = false;
         public string Title { get; set; } = "Terminal";
-        string message;
-        ConsoleColor messageColor = ConsoleColor.DarkRed;
-        public object SelectedItem { 
+        private string message;
+        private ConsoleColor messageColor = ConsoleColor.DarkRed;
+
+        public object SelectedItem
+        {
             get
             {
-                if(selectedIndex >= 0)
+                if (selectedIndex >= 0)
                     return WindowList[selectedIndex];
                 return null;
             }
         }
+
         public ConsoleColor SelectionBackground { get; set; } = ConsoleColor.Gray;
         public ConsoleColor SelectionForeground { get; set; } = ConsoleColor.Black;
 
@@ -62,13 +68,15 @@ namespace ConsoleLib
             Console.SetOut(new StreamWriter(new FileStream(new SafeFileHandle(output, true), FileAccess.Write)) { AutoFlush = true });
             Console.CursorVisible = false;
         }
-        void WriteLine(object obj, int line = -1, object[] arg = null)
+
+        private void WriteLine(object obj, int line = -1, object[] arg = null)
         {
             WriteLine(obj, DefaultForeground, DefaultBackground, line, arg);
         }
-        void WriteLine(object obj, ConsoleColor foregroundColor, ConsoleColor backgroundColor, int line = -1, object[] arg = null)
+
+        private void WriteLine(object obj, ConsoleColor foregroundColor, ConsoleColor backgroundColor, int line = -1, object[] arg = null)
         {
-            if(line >= 0)
+            if (line >= 0)
                 Console.SetCursorPosition(0, line);
             int cursor = Console.CursorLeft;
             int width = Console.WindowWidth;
@@ -80,11 +88,13 @@ namespace ConsoleLib
             else
                 Console.Write(obj.ToString() + new string(' ', width - cursor - len));
         }
-        void Write(object obj, object[] arg = null)
+
+        private void Write(object obj, object[] arg = null)
         {
-            Write(obj, ConsoleColor.Gray, ConsoleColor.Black, arg);
+            Write(obj, DefaultForeground, DefaultBackground, arg);
         }
-        void Write(object obj, ConsoleColor foregroundColor, ConsoleColor backgroundColor, object[] arg = null)
+
+        private void Write(object obj, ConsoleColor foregroundColor, ConsoleColor backgroundColor, object[] arg = null)
         {
             Console.ForegroundColor = foregroundColor;
             Console.BackgroundColor = backgroundColor;
@@ -93,31 +103,37 @@ namespace ConsoleLib
             else
                 Console.Write(obj);
         }
-        void Choose(bool next)
+
+        private void Choose(bool next)
         {
             if (next)
             {
                 selectedIndex += 1;
                 if (selectedIndex >= WindowList.Count)
                     selectedIndex = 0;
-            } else
+            }
+            else
             {
                 selectedIndex -= 1;
                 if (selectedIndex < 0)
                     selectedIndex = WindowList.Count - 1;
             }
         }
+
         public void ShowMessage(string message)
         {
             this.message = message;
         }
+
         public void ShowMessage(string message, ConsoleColor color)
         {
             messageColor = color;
             ShowMessage(message);
         }
-        const int headerHeight = 2;
-        void renderHead()
+
+        private const int headerHeight = 2;
+
+        private void renderHead()
         {
             Console.SetCursorPosition(0, 0);
             Write($"{Title}\t", SelectionForeground, SelectionBackground);
@@ -125,9 +141,12 @@ namespace ConsoleLib
                 WriteLine(message, messageColor, SelectionBackground);
             else
                 WriteLine("", messageColor, SelectionBackground);
+            WriteLine("");
         }
-        const int footerHeight = 2;
-        void renderFooter()
+
+        private const int footerHeight = 2;
+
+        private void renderFooter()
         {
             int bottomline = Console.WindowHeight - 1;
             Console.SetCursorPosition(0, bottomline);
@@ -143,8 +162,15 @@ namespace ConsoleLib
             Write($"{visibleTop}", SelectionForeground, SelectionBackground);
             Write("\tSel");
             Write($"{selectedIndex}", SelectionForeground, SelectionBackground);
+            var pos = Console.CursorLeft;
+            var width = Console.WindowWidth;
+            if (width > pos)
+            {
+                Write(new string(' ', width - pos - 1));
+            }
         }
-        void renderList()
+
+        private void renderList()
         {
             int height = Console.WindowHeight - 1;
 
@@ -187,29 +213,33 @@ namespace ConsoleLib
                 line++;
             }
         }
-        void renderFull()
+
+        private void renderFull()
         {
             Console.CursorVisible = false;
             renderHead();
             renderList();
             renderFooter();
         }
+
         public void Loop()
         {
             visibleBottom = Console.WindowHeight - 3;
-            while(!stop)
+            while (!stop)
             {
                 if (Console.KeyAvailable)
                 {
                     ConsoleKeyInfo cki = Console.ReadKey(true);
-                    switch(cki.Key)
+                    switch (cki.Key)
                     {
                         case ConsoleKey.Escape:
                             stop = true;
                             break;
+
                         case ConsoleKey.DownArrow:
                             Choose(true);
                             break;
+
                         case ConsoleKey.UpArrow:
                             Choose(false);
                             break;
@@ -220,6 +250,7 @@ namespace ConsoleLib
                 //Thread.Sleep(10);
             }
         }
+
         ~ConsoleMan()
         {
             FreeConsole();
