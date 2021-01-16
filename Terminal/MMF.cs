@@ -22,7 +22,8 @@ namespace Terminal
                         if (Encoding.ASCII.GetString(readOut) == "Hello world!")
                         {
                             Console.WriteLine("The perfect task manager is already up and running.\nEnjoy it!!!");
-                            Tree();
+                            System.Threading.Tasks.Task.Factory.StartNew(() => Tree());
+                            VBScript.CallVBScript();
                             Environment.Exit(0);
                         }
                     }
