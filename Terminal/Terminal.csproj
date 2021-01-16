@@ -49,6 +49,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="MMF.cs" />
+    <Compile Include="VBScript.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="PropertiesConsole.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -61,6 +62,17 @@
       <Project>{0e0da24c-04ea-4b13-8586-f7e3b7de8bd5}</Project>
       <Name>ConsoleLib</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <COMReference Include="MSScriptControl">
+      <Guid>{0E59F1D2-1FBE-11D0-8FF2-00A0D10038BC}</Guid>
+      <VersionMajor>1</VersionMajor>
+      <VersionMinor>0</VersionMinor>
+      <Lcid>0</Lcid>
+      <WrapperTool>tlbimp</WrapperTool>
+      <Isolated>False</Isolated>
+      <EmbedInteropTypes>True</EmbedInteropTypes>
+    </COMReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
