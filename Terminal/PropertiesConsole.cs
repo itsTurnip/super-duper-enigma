@@ -157,7 +157,7 @@ namespace Terminal
         private void TrackBarTransparent_ValueChanged(object sender, EventArgs e)
         {
             IntPtr handle = GetConsoleWindow();
-            SetLayeredWindowAttributes(handle, 0, Convert.ToByte(trackBarTransparent.Value * 0xFF / 100), 0x2);
+            SetLayeredWindowAttributes(handle, 0, Convert.ToByte(Math.Ceiling((double)trackBarTransparent.Value * 0xFF / 100)), 0x2);
             textBoxDispPer.Text = $"{trackBarTransparent.Value}";
         }
 
