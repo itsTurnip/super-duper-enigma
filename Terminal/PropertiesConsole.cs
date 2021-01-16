@@ -1,10 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
 using System.Runtime.InteropServices;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 
 namespace Terminal
@@ -17,7 +14,6 @@ namespace Terminal
         private ComboBox comboBoxChangeColor;
         private RadioButton radioButtonFontColor;
         private RadioButton radioButtonBackColor;
-        private Button buttonTransparent;
         private Button buttonOK;
         private Button buttonCancel;
         private GroupBox groupBoxTransparent;
@@ -29,6 +25,9 @@ namespace Terminal
         [DllImport("user32.dll")]
         private static extern bool SetLayeredWindowAttributes(IntPtr hWnd, uint crKey, byte bAlpha, uint dwFlags);
 
+        [DllImport("user32.dll")]
+        private static extern bool GetLayeredWindowAttributes(IntPtr hWnd, out uint crKey, out byte bAlpha, out uint dwFlags);
+
         [DllImport("kernel32.dll", SetLastError = true)]
         internal static extern IntPtr GetConsoleWindow();
 
@@ -38,13 +37,16 @@ namespace Terminal
 
         public PropertiesConsole()
         {
+            var transparentConsole = GetLayeredWindowAttributes(GetConsoleWindow(), out uint crKey, out byte bAlpha, out uint dwFlags) ? bAlpha * 100 / 0xFF : 100;
+
             Application.EnableVisualStyles();
             form = new Form()
             {
                 FormBorderStyle = FormBorderStyle.FixedToolWindow,
                 AutoSize = true,
                 Text = "Properties",
-                ShowIcon = false
+                ShowIcon = false,
+                StartPosition = FormStartPosition.CenterScreen,
             };
             tabControl = new TabControl()
             {
@@ -94,7 +96,10 @@ namespace Terminal
             trackBarTransparent = new TrackBar()
             {
                 Location = new Point(33, 19),
-                Size = new Size(154, 45)
+                Size = new Size(154, 45),
+                TickFrequency = 10,
+                Maximum = 100,
+                Value = transparentConsole
             };
             labelZeroPer = new Label()
             {
@@ -112,8 +117,9 @@ namespace Terminal
             {
                 BackColor = SystemColors.Control,
                 Location = new Point(241, 16),
-                Size = new Size(23, 20),
-                ReadOnly = true
+                Size = new Size(25, 20),
+                ReadOnly = true,
+                Text = $"{transparentConsole}"
             };
 
             AddItems();
@@ -145,6 +151,14 @@ namespace Terminal
             radioButtonBackColor.CheckedChanged += RadioButtonColor_CheckedChanged;
             buttonOK.Click += ButtonOK_Click;
             buttonCancel.Click += ButtonCancel_Click;
+            trackBarTransparent.ValueChanged += TrackBarTransparent_ValueChanged;
+        }
+
+        private void TrackBarTransparent_ValueChanged(object sender, EventArgs e)
+        {
+            IntPtr handle = GetConsoleWindow();
+            SetLayeredWindowAttributes(handle, 0, Convert.ToByte(trackBarTransparent.Value * 0xFF / 100), 0x2);
+            textBoxDispPer.Text = $"{trackBarTransparent.Value}";
         }
 
         private void RadioButtonColor_CheckedChanged(object sender, EventArgs e)
@@ -177,14 +191,6 @@ namespace Terminal
         {
             form.DialogResult = DialogResult.Cancel;
             form.Close();
-        }
-
-        private void ButtonTransparent_Click(object sender, EventArgs e)
-        {
-            uint LWA_ALPHA = 0x2;
-
-            IntPtr Handle = GetConsoleWindow();
-            SetLayeredWindowAttributes(Handle, 0, 100, LWA_ALPHA);
         }
     }
 }
