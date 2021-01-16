@@ -66,7 +66,6 @@ namespace ConsoleLib
             IntPtr output = GetStdHandle(StdHandle.Output);
             Console.SetIn(new StreamReader(new FileStream(new SafeFileHandle(input, true), FileAccess.Read)));
             Console.SetOut(new StreamWriter(new FileStream(new SafeFileHandle(output, true), FileAccess.Write)) { AutoFlush = true });
-            Console.CursorVisible = false;
         }
 
         private void WriteLine(object obj, int line = -1, object[] arg = null)
@@ -138,7 +137,7 @@ namespace ConsoleLib
         private void renderHead()
         {
             Console.SetCursorPosition(0, 0);
-            Write($"{Title}\t", SelectionForeground, SelectionBackground);
+            Write($"{Title}    ", SelectionForeground, SelectionBackground);
             if (message != null)
                 WriteLine(message, messageColor, SelectionBackground);
             else
@@ -150,23 +149,24 @@ namespace ConsoleLib
 
         private void renderFooter()
         {
+            const string s = "    ";
             int bottomline = Console.WindowHeight - 1;
             Console.SetCursorPosition(0, bottomline);
             Write("Esc");
             Write("Exit", SelectionForeground, SelectionBackground);
-            Write("\tUp");
+            Write(s+"Up");
             Write("Previous", SelectionForeground, SelectionBackground);
-            Write("\tDown");
+            Write(s+"Down");
             Write("Next", SelectionForeground, SelectionBackground);
-            Write("\tBot");
+            Write(s+"Bot");
             Write($"{visibleBottom}", SelectionForeground, SelectionBackground);
-            Write("\tTop");
+            Write(s+"Top");
             Write($"{visibleTop}", SelectionForeground, SelectionBackground);
-            Write("\tSel");
+            Write(s+"Sel");
             Write($"{selectedIndex}", SelectionForeground, SelectionBackground);
             foreach(MenuKeyInfo keyInfo in Keys)
             {
-                Write($"\t{keyInfo.Key}");
+                Write(s+$"{keyInfo.Key}");
                 Write($"{keyInfo.Description}", SelectionForeground, SelectionBackground);
             }
             var pos = Console.CursorLeft;
@@ -233,7 +233,7 @@ namespace ConsoleLib
 
         public void Loop()
         {
-            visibleBottom = Console.WindowHeight - 3;
+            visibleBottom = Console.WindowHeight - footerHeight - 1;
             while (!stop)
             {
                 if (Console.KeyAvailable)
