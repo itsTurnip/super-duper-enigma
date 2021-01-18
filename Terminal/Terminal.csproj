@@ -46,9 +46,6 @@
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
-    <Reference Include="System.Data" />
-    <Reference Include="System.Net.Http" />
-    <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="CheckLoad.cs" />
@@ -67,6 +64,10 @@
     <ProjectReference Include="..\ConsoleLib\ConsoleLib.csproj">
       <Project>{0e0da24c-04ea-4b13-8586-f7e3b7de8bd5}</Project>
       <Name>ConsoleLib</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\DispatcherLib\DispatcherLib.csproj">
+      <Project>{635f89a0-fbb9-410a-95d6-41b72af1a690}</Project>
+      <Name>DispatcherLib</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>

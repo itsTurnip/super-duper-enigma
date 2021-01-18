@@ -9,6 +9,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ConsoleLib", "..\ConsoleLib
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ProcessLib", "..\ProcessLib\ProcessLib.csproj", "{FA578469-F3FA-4F44-BD94-81C1E759E56C}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DispatcherLib", "..\DispatcherLib\DispatcherLib.csproj", "{635F89A0-FBB9-410A-95D6-41B72AF1A690}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -27,6 +29,10 @@ Global
 		{FA578469-F3FA-4F44-BD94-81C1E759E56C}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{FA578469-F3FA-4F44-BD94-81C1E759E56C}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{FA578469-F3FA-4F44-BD94-81C1E759E56C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{635F89A0-FBB9-410A-95D6-41B72AF1A690}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{635F89A0-FBB9-410A-95D6-41B72AF1A690}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{635F89A0-FBB9-410A-95D6-41B72AF1A690}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{635F89A0-FBB9-410A-95D6-41B72AF1A690}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
