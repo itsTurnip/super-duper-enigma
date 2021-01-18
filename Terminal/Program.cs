@@ -6,12 +6,13 @@ namespace Terminal
 {
     internal class Program
     {
+        static Dispatcher dispatcher;
         private static void Main(string[] args)
         {
             ConsoleMan man = new ConsoleMan();
             CheckLoad mmf = new CheckLoad();
             mmf.CheckLoadMMF();
-            Dispatcher dispatcher = new Dispatcher();
+            dispatcher = new Dispatcher();
             man.WindowList = dispatcher.GetList();
             man.ShowMessage("Bullshit happens");
             man.Keys.AddRange(new MenuKeyInfo[]
@@ -21,7 +22,9 @@ namespace Terminal
                 new MenuKeyInfo()
                 { Key = "R", Description = "Run file"},
                 new MenuKeyInfo()
-                { Key = "T", Description = "Report"}
+                { Key = "T", Description = "Report"},
+                new MenuKeyInfo()
+                { Key = "K", Description = "Kill" }
             });
             man.KeyPressed += Man_KeyPressed;
 			man.Loop();
@@ -32,7 +35,6 @@ namespace Terminal
             ConsoleMan man = (ConsoleMan)e.Sender;
             if (e.Key == ConsoleKey.S)
             {
-                
                 PropertiesConsole properties = new PropertiesConsole();
                 if (properties.form.ShowDialog() == System.Windows.Forms.DialogResult.OK)
                 {
@@ -40,14 +42,21 @@ namespace Terminal
                     man.DefaultBackground = properties.DefaultBackgroundProperties;
                 }
             }
-            if (e.Key == ConsoleKey.R)
+            else if (e.Key == ConsoleKey.R)
             {
                 FileRun.Run();
             }
-            if (e.Key == ConsoleKey.T)
+            else if (e.Key == ConsoleKey.K)
             {
-                Report report = new Report();
-                report.DoReport(man.WindowList);
+                if (dispatcher.Kill(man.SelectedIndex))
+                {
+                    man.ShowMessage("Success!", ConsoleColor.Green);
+                    man.SelectedIndex = man.SelectedIndex; // пересчет на случай, если оказались в последней позиции и произошло удаление => отсутствие OutOfRangeException
+                }
+                else
+                {
+                    man.ShowMessage("Couldn't kill process. Maybe it's system process", ConsoleColor.Red);
+                }
             }
         }
     }

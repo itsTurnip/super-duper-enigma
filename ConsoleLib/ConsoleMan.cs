@@ -57,6 +57,18 @@ namespace ConsoleLib
 
         public ConsoleColor DefaultForeground { get; set; } = ConsoleColor.Gray;
         public List<MenuKeyInfo> Keys { get; } = new List<MenuKeyInfo>();
+        public int SelectedIndex
+        {
+            get => selectedIndex;
+            set
+            {
+                selectedIndex = value;
+                if (selectedIndex >= WindowList.Count)
+                    selectedIndex = 0;
+                if (selectedIndex < 0)
+                    selectedIndex = WindowList.Count - 1;
+            }
+        }
 
         public ConsoleMan()
         {
@@ -103,22 +115,6 @@ namespace ConsoleLib
                 Console.Write(obj.ToString(), arg);
             else
                 Console.Write(obj);
-        }
-
-        private void Choose(bool next)
-        {
-            if (next)
-            {
-                selectedIndex += 1;
-                if (selectedIndex >= WindowList.Count)
-                    selectedIndex = 0;
-            }
-            else
-            {
-                selectedIndex -= 1;
-                if (selectedIndex < 0)
-                    selectedIndex = WindowList.Count - 1;
-            }
         }
 
         public void ShowMessage(string message)
@@ -246,11 +242,11 @@ namespace ConsoleLib
                             break;
 
                         case ConsoleKey.DownArrow:
-                            Choose(true);
+                            SelectedIndex += 1;
                             break;
 
                         case ConsoleKey.UpArrow:
-                            Choose(false);
+                            SelectedIndex -= 1;
                             break;
                     }
                     KeyPressed?.Invoke(new KeyPressedEvent(this, cki.Key));
