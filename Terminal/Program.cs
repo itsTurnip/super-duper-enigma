@@ -29,9 +29,10 @@ namespace Terminal
 
         private static void Man_KeyPressed(KeyPressedEvent e)
         {
+            ConsoleMan man = (ConsoleMan)e.Sender;
             if (e.Key == ConsoleKey.S)
             {
-                ConsoleMan man = (ConsoleMan)e.Sender;
+                
                 PropertiesConsole properties = new PropertiesConsole();
                 if (properties.form.ShowDialog() == System.Windows.Forms.DialogResult.OK)
                 {
@@ -42,6 +43,11 @@ namespace Terminal
             if (e.Key == ConsoleKey.R)
             {
                 FileRun.Run();
+            }
+            if (e.Key == ConsoleKey.T)
+            {
+                Report report = new Report();
+                report.DoReport(man.WindowList);
             }
         }
     }
