@@ -48,8 +48,9 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="MMF.cs" />
-    <Compile Include="VBScript.cs" />
+    <Compile Include="CheckLoad.cs" />
+    <Compile Include="FileRun.cs" />
+    <Compile Include="ErrorMessageMSS.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="PropertiesConsole.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -73,6 +74,11 @@
       <Isolated>False</Isolated>
       <EmbedInteropTypes>True</EmbedInteropTypes>
     </COMReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="WSCRun.wsc">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

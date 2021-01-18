@@ -34,10 +34,11 @@ namespace Terminal
         public ConsoleColor DefaultBackgroundProperties { get; set; } = ConsoleColor.Black;
 
         public ConsoleColor DefaultForegroundProperties { get; set; } = ConsoleColor.Gray;
+        public int TransparentConsole { get; set; }
 
         public PropertiesConsole()
         {
-            var transparentConsole = GetLayeredWindowAttributes(GetConsoleWindow(), out uint crKey, out byte bAlpha, out uint dwFlags) ? bAlpha * 100 / 0xFF : 100;
+            TransparentConsole = GetLayeredWindowAttributes(GetConsoleWindow(), out uint crKey, out byte bAlpha, out uint dwFlags) ? bAlpha * 100 / 0xFF : 100;
 
             Application.EnableVisualStyles();
             form = new Form()
@@ -99,7 +100,7 @@ namespace Terminal
                 Size = new Size(154, 45),
                 TickFrequency = 10,
                 Maximum = 100,
-                Value = transparentConsole
+                Value = TransparentConsole
             };
             labelZeroPer = new Label()
             {
@@ -119,7 +120,7 @@ namespace Terminal
                 Location = new Point(241, 16),
                 Size = new Size(25, 20),
                 ReadOnly = true,
-                Text = $"{transparentConsole}"
+                Text = $"{TransparentConsole}"
             };
 
             AddItems();
@@ -183,12 +184,16 @@ namespace Terminal
             {
                 DefaultBackgroundProperties = (ConsoleColor)comboBoxChangeColor.SelectedItem;
             }
+
             form.DialogResult = DialogResult.OK;
             form.Close();
         }
 
         private void ButtonCancel_Click(object sender, EventArgs e)
         {
+            IntPtr handle = GetConsoleWindow();
+            SetLayeredWindowAttributes(handle, 0, Convert.ToByte(Math.Ceiling((double)TransparentConsole * 0xFF / 100)), 0x2);
+
             form.DialogResult = DialogResult.Cancel;
             form.Close();
         }
