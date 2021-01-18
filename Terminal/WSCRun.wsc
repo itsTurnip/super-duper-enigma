@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="windows-1251"?>
+<component>
+
+<?component error="true" debug="false"?>
+
+<registration
+	description="WSCRun"
+	progid="WSCRun.WSC"
+	version="1.00"
+	classid="{2d9fd34e-688b-43f2-a9fa-67c909414d3e}"
+>
+</registration>
+
+<public>
+	<method name="Run">
+	</method>
+</public>
+
+<script language="VBScript">
+<![CDATA[
+
+function Run()
+	Dim WshShell
+	Set WshShell = CreateObject("WScript.Shell")
+	Set Shell = CreateObject("Shell.Application")
+	Shell.FileRun()
+end function
+
+]]>
+</script>
+
+</component>
