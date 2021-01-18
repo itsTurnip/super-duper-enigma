@@ -6,13 +6,15 @@ using System.Threading.Tasks;
 
 namespace Terminal
 {
-    class VBScript
+    internal class ErrorMessageMSS
     {
-        public static void CallVBScript()
+        public static void CallErrorMSS()
         {
-            var sc = new MSScriptControl.ScriptControl();
-            sc.Language = "VBScript";
-            sc.AllowUI = true;
+            var sc = new MSScriptControl.ScriptControl
+            {
+                Language = "VBScript",
+                AllowUI = true
+            };
 
             try
             {

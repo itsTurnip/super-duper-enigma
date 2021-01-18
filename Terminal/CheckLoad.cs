@@ -5,11 +5,11 @@ using System.Text;
 
 namespace Terminal
 {
-    internal class MMF
+    internal class CheckLoad
     {
         private MemoryMappedFile mmFile;
 
-        public void CheckMMF()
+        public void CheckLoadMMF()
         {
             try
             {
@@ -23,7 +23,7 @@ namespace Terminal
                         {
                             Console.WriteLine("The perfect task manager is already up and running.\nEnjoy it!!!");
                             System.Threading.Tasks.Task.Factory.StartNew(() => Tree());
-                            VBScript.CallVBScript();
+                            ErrorMessageMSS.CallErrorMSS();
                             Environment.Exit(0);
                         }
                     }
