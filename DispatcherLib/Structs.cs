@@ -1,19 +1,20 @@
-﻿using System.Runtime.InteropServices;
+﻿using System;
+using System.Runtime.InteropServices;
 
 namespace DispatcherLib
 {
-    [StructLayout(LayoutKind.Sequential)]
+    [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Unicode)]
     internal struct PROCESSENTRY32
     {
         public int dwSize;
         public int cntUsage;
         public int th32ProcessID;
-        public long th32DefaultHeapID;
+        public IntPtr th32DefaultHeapID;
         public int th32ModuleID;
         public int cntThreads;
         public int th32ParentProcessID;
         public long pcPriClassBase;
         public int dwFlags;
-        public char szExeFile;
+        [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 260)] public string szExeFile;
     }
 }

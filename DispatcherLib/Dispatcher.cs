@@ -1,6 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Runtime.InteropServices;
+using System.Collections.Generic;
 
 namespace DispatcherLib
 {
@@ -10,13 +10,13 @@ namespace DispatcherLib
     public class Dispatcher
     {
         private const int TH32CS_SNAPPROCESS = 0x2;
-        [DllImport("tlhelp32.dll", SetLastError = true)]
+        [DllImport("kernel32.dll", SetLastError = true)]
         private static extern IntPtr CreateToolhelp32Snapshot(int dwFlags, int dwProcessId);
-        [DllImport("tlhelp32.dll", SetLastError = true)]
-        private static extern bool Process32First(IntPtr hSnapshot, out PROCESSENTRY32 peProcessEntry);
-        [DllImport("tlhelp32.dll", SetLastError = true)]
-        private static extern bool Process32Next(IntPtr hSnapshot, out PROCESSENTRY32 peProcessEntry);
-        [DllImport("tlhelp32.dll", SetLastError = true)]
+        [DllImport("kernel32.dll", SetLastError = true)]
+        private static extern bool Process32First(IntPtr hSnapshot, ref PROCESSENTRY32 peProcessEntry);
+        [DllImport("kernel32.dll", SetLastError = true)]
+        private static extern bool Process32Next(IntPtr hSnapshot, ref PROCESSENTRY32 peProcessEntry);
+        [DllImport("kernel32.dll", SetLastError = true)]
         private static extern bool CloseHandle(IntPtr hObject);
 
         private ThreadSafeList<object> procs = new ThreadSafeList<object>();
@@ -25,7 +25,11 @@ namespace DispatcherLib
             IntPtr hSnapshot = CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, 0);
             try
             {
-                if (hSnapshot != null && Process32First(hSnapshot, out PROCESSENTRY32 procInfo))
+                PROCESSENTRY32 procInfo = new PROCESSENTRY32
+                {
+                    dwSize = 296
+                };
+                if (hSnapshot != null && Process32First(hSnapshot, ref procInfo))
                 {
                     do
                     {
@@ -35,10 +39,10 @@ namespace DispatcherLib
                             continue;
                         procs.Add(proc);
                         proc.Listen();
-
-                    } while (Process32Next(hSnapshot, out procInfo));
+                    } while (Process32Next(hSnapshot, ref procInfo));
                 }
-            } finally
+            }
+            finally
             {
                 if (hSnapshot != null)
                     CloseHandle(hSnapshot);

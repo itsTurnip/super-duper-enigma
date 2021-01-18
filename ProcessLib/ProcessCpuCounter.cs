@@ -1,40 +1,41 @@
 ﻿using System.Linq;
 using System.Diagnostics;
 using System.IO;
-
-internal static class ProcessCpuCounter
+namespace ProcessLib
 {
-    internal static PerformanceCounter GetPerfCounterForProcessId(int processId, string processCounterName = "% Processor Time")
+    internal static class ProcessCpuCounter
     {
-        string instance = GetInstanceNameForProcessId(processId);
-        if (string.IsNullOrEmpty(instance))
-            return null;
-
-        return new PerformanceCounter("Process", processCounterName, instance);
-    }
-
-    internal static string GetInstanceNameForProcessId(int processId)
-    {
-        var process = Process.GetProcessById(processId);
-        string processName = Path.GetFileNameWithoutExtension(process.ProcessName);
-
-        PerformanceCounterCategory cat = new PerformanceCounterCategory("Process");
-        string[] instances = cat.GetInstanceNames()
-            .Where(inst => inst.StartsWith(processName))
-            .ToArray();
-
-        foreach (string instance in instances)
+        internal static PerformanceCounter GetPerfCounterForProcessId(Process process, string processCounterName = "% Processor Time")
         {
-            using (PerformanceCounter cnt = new PerformanceCounter("Process",
-                "ID Process", instance, true))
+            string instance = GetInstanceNameForProcessId(process);
+            if (string.IsNullOrEmpty(instance))
+                return null;
+
+            return new PerformanceCounter("Process", processCounterName, instance);
+        }
+
+        internal static string GetInstanceNameForProcessId(Process process)
+        {
+            string processName = process.ProcessName.Replace(".exe", "");
+
+            PerformanceCounterCategory cat = new PerformanceCounterCategory("Process");
+            string[] instances = cat.GetInstanceNames()
+                .Where(inst => inst.StartsWith(processName))
+                .ToArray();
+
+            foreach (string instance in instances)
             {
-                int val = (int)cnt.RawValue;
-                if (val == processId)
+                using (PerformanceCounter cnt = new PerformanceCounter("Process",
+                    "ID Process", instance, true))
                 {
-                    return instance;
+                    int val = (int)cnt.RawValue;
+                    if (val == process.Id)
+                    {
+                        return instance;
+                    }
                 }
             }
+            return null;
         }
-        return null;
     }
 }
