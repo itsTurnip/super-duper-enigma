@@ -30,7 +30,7 @@ namespace ConsoleLib
 
         private int visibleTop = 0;
         private int visibleBottom = 0;
-        public List<object> WindowList { get; } = new List<object>();
+        public IList<object> WindowList { get; set; } = new List<object>();
 
         public event KeyPressedEventHandler KeyPressed;
 

@@ -19,6 +19,7 @@ namespace Terminal
                 Description = "Setting"
             }});
             man.Loop();
+
         }
     }
 }
