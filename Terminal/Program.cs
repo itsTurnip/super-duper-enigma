@@ -1,4 +1,5 @@
-﻿using ConsoleLib;
+﻿using System;
+using ConsoleLib;
 using DispatcherLib;
 
 namespace Terminal
@@ -8,10 +9,10 @@ namespace Terminal
         private static void Main(string[] args)
         {
             ConsoleMan man = new ConsoleMan();
-            Dispatcher dispatcher = new Dispatcher();
-            man.WindowList = dispatcher.GetList();
             CheckLoad mmf = new CheckLoad();
             mmf.CheckLoadMMF();
+            Dispatcher dispatcher = new Dispatcher();
+            man.WindowList = dispatcher.GetList();
             man.ShowMessage("Bullshit happens");
             man.Keys.AddRange(new MenuKeyInfo[]
             {
