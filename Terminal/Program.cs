@@ -14,17 +14,21 @@ namespace Terminal
             CheckLoad mmf = new CheckLoad();
             mmf.CheckLoadMMF();
             man.ShowMessage("Bullshit happens");
-            man.Keys.AddRange(new MenuKeyInfo[] { new MenuKeyInfo()
+            man.Keys.AddRange(new MenuKeyInfo[]
             {
-                Key = "P",
-                Description = "Setting"
-            }});
+                new MenuKeyInfo()
+                { Key = "S", Description = "Settings"},
+                new MenuKeyInfo()
+                { Key = "R", Description = "Run file"},
+                new MenuKeyInfo()
+                { Key = "T", Description = "Report"}
+            });
             man.Loop();
         }
 
         private static void Man_KeyPressed(KeyPressedEvent e)
         {
-            if (e.Key == ConsoleKey.P)
+            if (e.Key == ConsoleKey.S)
             {
                 ConsoleMan man = (ConsoleMan)e.Sender;
                 PropertiesConsole properties = new PropertiesConsole();
@@ -36,7 +40,7 @@ namespace Terminal
             }
             if (e.Key == ConsoleKey.R)
             {
-                FileRun.ExecuteCommand();
+                FileRun.Run();
             }
         }
     }
