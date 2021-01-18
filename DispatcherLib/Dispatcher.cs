@@ -52,5 +52,16 @@ namespace DispatcherLib
         {
             return procs;
         }
+        public bool Kill(int num)
+        {
+            
+            dynamic proc = procs[num];
+            if (proc.Kill())
+            {
+                procs.RemoveAt(num);
+                return true;
+            }
+            return false;
+        }
     }
 }

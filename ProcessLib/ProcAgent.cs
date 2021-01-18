@@ -2,6 +2,7 @@
 using System.Runtime.InteropServices;
 using System.Diagnostics;
 using System.Threading;
+using System.ComponentModel;
 
 namespace ProcessLib
 {
@@ -97,7 +98,7 @@ namespace ProcessLib
         }
         public override string ToString()
         {
-            const int maxLength = 15;
+            const int maxLength = 25;
             string name = (Name.Length > maxLength) ? Name.Substring(0, maxLength) : Name.PadRight(maxLength);
             return $"{GetPID()}  \t{name}\t{CpuUsage * 100:0.#}%\t{RamUsage}MB";
         }
@@ -108,7 +109,12 @@ namespace ProcessLib
                 process.Kill();
                 Dispose();
                 return true;
-            } catch (Exception)
+            }
+            catch (Win32Exception)
+            {
+                return false;
+            }
+            catch (InvalidOperationException)
             {
                 return false;
             }
