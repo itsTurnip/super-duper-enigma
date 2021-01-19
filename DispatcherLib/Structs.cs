@@ -3,6 +3,7 @@ using System.Runtime.InteropServices;
 
 namespace DispatcherLib
 {
+    
     [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Unicode)]
     internal struct PROCESSENTRY32
     {

@@ -13,6 +13,7 @@ namespace Terminal
             CheckLoad mmf = new CheckLoad();
             mmf.CheckLoadMMF();
             dispatcher = new Dispatcher();
+            dispatcher.Listen();
             man.WindowList = dispatcher.GetList();
             man.ShowMessage("Bullshit happens");
             man.Keys.AddRange(new MenuKeyInfo[]
@@ -32,7 +33,8 @@ namespace Terminal
                 "PID  ", "Name".PadRight(nameLength), "CPU", "RAM"
             });
             man.KeyPressed += Man_KeyPressed;
-			man.Loop();
+            man.Loop();
+            dispatcher.Stop();
         }
 
         private static void Man_KeyPressed(KeyPressedEvent e)

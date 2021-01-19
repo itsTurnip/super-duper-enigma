@@ -18,7 +18,7 @@ namespace DispatcherLib
             return Clone().GetEnumerator();
         }
 
-        protected static object _lock = new object();
+        protected object _lock = new object();
 
         public int Count
         {

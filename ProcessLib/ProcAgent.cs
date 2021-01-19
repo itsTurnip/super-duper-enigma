@@ -1,8 +1,8 @@
 ﻿using System;
-using System.Runtime.InteropServices;
-using System.Diagnostics;
-using System.Threading;
 using System.ComponentModel;
+using System.Diagnostics;
+using System.Runtime.InteropServices;
+using System.Threading;
 
 namespace ProcessLib
 {
@@ -22,12 +22,16 @@ namespace ProcessLib
         private PerformanceCounter cpuCounter;
         private Process process;
         private volatile bool stop;
-        public bool Exited { get => process.HasExited; }
+        public bool Exited
+        {
+            get => (process != null) ? process.HasExited : true;
+        }
         public long RamUsage { get; private set; }
         public string Name { get; private set; }
         public double CpuUsage { get; private set; }
         private TimeSpan lastCpuTime;
         private Stopwatch stopwatch;
+
         public ProcAgent()
         {
 
@@ -42,12 +46,21 @@ namespace ProcessLib
             {
                 process = Process.GetProcessById(pid);
                 Name = process.ProcessName;
+                process.EnableRaisingEvents = true;
+                process.Exited += Process_Exited;
                 return true;
-            } catch(ArgumentException)
+            } 
+            catch (Exception ex) when (ex is ArgumentException || ex is Win32Exception)
             { 
                 return false;
             }
         }
+
+        private void Process_Exited(object sender, EventArgs e)
+        {
+            Dispose();
+        }
+
         private bool UpdateProcInfo()
         {
             try
@@ -56,7 +69,6 @@ namespace ProcessLib
                 {
                     TimeSpan cpuTime = process.TotalProcessorTime;
                     stopwatch.Stop();
-
                     process.Refresh();
                     RamUsage = process.WorkingSet64 / (1024 * 1024);
                     CpuUsage = (cpuTime - lastCpuTime).TotalMilliseconds / (Environment.ProcessorCount * stopwatch.ElapsedMilliseconds);
@@ -70,22 +82,24 @@ namespace ProcessLib
                     return false;
                 }
             }
-            catch (System.ComponentModel.Win32Exception)
+            catch 
             {
                 return false;
             }
         }
+        private const int UpdateDelay = 1000;
         private void Loop()
         {
             stopwatch = Stopwatch.StartNew();
             while (!stop && UpdateProcInfo()) 
             {
-                Thread.Sleep(3000);
+                Thread.Sleep(UpdateDelay);
             }
         }
         
         public void Listen()
         {
+            
             Thread thread = new Thread(Loop)
             {
                 IsBackground = true,
@@ -98,8 +112,8 @@ namespace ProcessLib
         }
         public override string ToString()
         {
-            const int maxLength = 25;
-            string name = (Name.Length > maxLength) ? Name.Substring(0, maxLength) : Name.PadRight(maxLength);
+            const int maxNameLength = 25;
+            string name = (Name.Length > maxNameLength) ? Name.Substring(0, maxNameLength) : Name.PadRight(maxNameLength);
             return $"{GetPID()}  \t{name}\t{CpuUsage * 100:0.#}%\t{RamUsage}MB";
         }
         public bool Kill()
@@ -134,11 +148,6 @@ namespace ProcessLib
                 cpuCounter = null;
             }
 
-        }
-
-        ~ProcAgent()
-        {
-            Dispose();
         }
     }
 }
