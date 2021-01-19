@@ -26,6 +26,11 @@ namespace Terminal
                 new MenuKeyInfo()
                 { Key = "K", Description = "Kill" }
             });
+            const int nameLength = 25;
+            man.Columns.AddRange(new string[]
+            {
+                "PID  ", "Name".PadRight(nameLength), "CPU", "RAM"
+            });
             man.KeyPressed += Man_KeyPressed;
 			man.Loop();
         }

@@ -57,6 +57,7 @@ namespace ConsoleLib
 
         public ConsoleColor DefaultForeground { get; set; } = ConsoleColor.Gray;
         public List<MenuKeyInfo> Keys { get; } = new List<MenuKeyInfo>();
+        public List<string> Columns { get; } = new List<string>();
         public int SelectedIndex
         {
             get => selectedIndex;
@@ -128,7 +129,7 @@ namespace ConsoleLib
             ShowMessage(message);
         }
 
-        private const int headerHeight = 2;
+        private const int headerHeight = 3;
 
         private void renderHead()
         {
@@ -138,10 +139,13 @@ namespace ConsoleLib
                 WriteLine(message, messageColor, SelectionBackground);
             else
                 WriteLine("", messageColor, SelectionBackground);
-            WriteLine("", 1);
+            foreach(var column in Columns)
+                Write($"{column}\t");
+            WriteLine("");
+            WriteLine("", 2);
         }
 
-        private const int footerHeight = 2;
+        private const int footerHeight = headerHeight;
 
         private void renderFooter()
         {
