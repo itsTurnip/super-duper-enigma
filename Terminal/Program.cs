@@ -54,7 +54,7 @@ namespace Terminal
             else if (e.Key == ConsoleKey.K)
             {
                 man.delete = true;
-                man.renderDelFooter();
+                man.renderDelFooter(man.SelectedItem);
                 man.KeyPressed += Man_DelKeyPressed;
             }
             else if(e.Key == ConsoleKey.T)

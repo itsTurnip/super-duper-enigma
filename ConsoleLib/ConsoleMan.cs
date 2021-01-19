@@ -180,7 +180,7 @@ namespace ConsoleLib
             
         }
 
-        public void renderDelFooter()
+        public void renderDelFooter(dynamic process)
         {
             
             const string s = "    ";
@@ -188,6 +188,7 @@ namespace ConsoleLib
             Console.SetCursorPosition(0, bottomline);
             Console.Write(new string(' ', Console.WindowWidth));
             Console.SetCursorPosition(0, bottomline);
+            Write($"Kill {process.Name}?\t");
             Write("Y");
             Write("Yes", SelectionForeground, SelectionBackground);
             Write(s + "N");
