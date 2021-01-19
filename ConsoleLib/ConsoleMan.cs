@@ -36,6 +36,7 @@ namespace ConsoleLib
 
         private int selectedIndex = -1;
         private bool stop = false;
+        public bool delete = false;
         public string Title { get; set; } = "Terminal";
         private string message;
         private ConsoleColor messageColor = ConsoleColor.DarkRed;
@@ -149,30 +150,48 @@ namespace ConsoleLib
 
         private void renderFooter()
         {
+            if (!delete)
+            {
+                const string s = "    ";
+                int bottomline = Console.WindowHeight - 1;
+                Console.SetCursorPosition(0, bottomline);
+                Write("Esc");
+                Write("Exit", SelectionForeground, SelectionBackground);
+                Write(s + "Up");
+                Write("Previous", SelectionForeground, SelectionBackground);
+                Write(s + "Down");
+                Write("Next", SelectionForeground, SelectionBackground);
+                Write(s + "Bot");
+                Write($"{visibleBottom}", SelectionForeground, SelectionBackground);
+                Write(s + "Top");
+                Write($"{visibleTop}", SelectionForeground, SelectionBackground);
+                Write(s + "Sel");
+                Write($"{selectedIndex}", SelectionForeground, SelectionBackground);
+                foreach (MenuKeyInfo keyInfo in Keys)
+                {
+                    Write(s + $"{keyInfo.Key}");
+                    Write($"{keyInfo.Description}", SelectionForeground, SelectionBackground);
+                }
+                var pos = Console.CursorLeft;
+                var width = Console.WindowWidth;
+                if (width > pos)
+                    Write(new string(' ', width - pos - 1));
+            }
+            
+        }
+
+        public void renderDelFooter()
+        {
+            
             const string s = "    ";
             int bottomline = Console.WindowHeight - 1;
             Console.SetCursorPosition(0, bottomline);
-            Write("Esc");
-            Write("Exit", SelectionForeground, SelectionBackground);
-            Write(s+"Up");
-            Write("Previous", SelectionForeground, SelectionBackground);
-            Write(s+"Down");
-            Write("Next", SelectionForeground, SelectionBackground);
-            Write(s+"Bot");
-            Write($"{visibleBottom}", SelectionForeground, SelectionBackground);
-            Write(s+"Top");
-            Write($"{visibleTop}", SelectionForeground, SelectionBackground);
-            Write(s+"Sel");
-            Write($"{selectedIndex}", SelectionForeground, SelectionBackground);
-            foreach(MenuKeyInfo keyInfo in Keys)
-            {
-                Write(s+$"{keyInfo.Key}");
-                Write($"{keyInfo.Description}", SelectionForeground, SelectionBackground);
-            }
-            var pos = Console.CursorLeft;
-            var width = Console.WindowWidth;
-            if (width > pos)
-                Write(new string(' ', width - pos - 1));
+            Console.Write(new string(' ', Console.WindowWidth));
+            Console.SetCursorPosition(0, bottomline);
+            Write("Y");
+            Write("Yes", SelectionForeground, SelectionBackground);
+            Write(s + "N");
+            Write("No", SelectionForeground, SelectionBackground);
         }
 
         private void renderList()
@@ -239,19 +258,23 @@ namespace ConsoleLib
                 if (Console.KeyAvailable)
                 {
                     ConsoleKeyInfo cki = Console.ReadKey(true);
-                    switch (cki.Key)
+                    if (!delete)
                     {
-                        case ConsoleKey.Escape:
-                            stop = true;
-                            break;
+                        switch (cki.Key)
+                        {
+                            case ConsoleKey.Escape:
+                                stop = true;
+                                break;
 
-                        case ConsoleKey.DownArrow:
-                            SelectedIndex += 1;
-                            break;
+                            case ConsoleKey.DownArrow:
+                                SelectedIndex += 1;
+                                break;
 
-                        case ConsoleKey.UpArrow:
-                            SelectedIndex -= 1;
-                            break;
+                            case ConsoleKey.UpArrow:
+                                SelectedIndex -= 1;
+                                break;
+                        }
+                        
                     }
                     KeyPressed?.Invoke(new KeyPressedEvent(this, cki.Key));
                 }

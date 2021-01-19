@@ -53,6 +53,22 @@ namespace Terminal
             }
             else if (e.Key == ConsoleKey.K)
             {
+                man.delete = true;
+                man.renderDelFooter();
+                man.KeyPressed += Man_DelKeyPressed;
+            }
+            else if(e.Key == ConsoleKey.T)
+            {
+                Report report = new Report();
+                report.DoReport(man.WindowList);
+            }
+        }
+
+        private static void Man_DelKeyPressed(KeyPressedEvent e)
+        {
+            ConsoleMan man = (ConsoleMan)e.Sender;
+            if (e.Key == ConsoleKey.Y)
+            {
                 if (dispatcher.Kill(man.SelectedIndex))
                 {
                     man.ShowMessage("Success!", ConsoleColor.Green);
@@ -62,12 +78,15 @@ namespace Terminal
                 {
                     man.ShowMessage("Couldn't kill process. Maybe it's system process", ConsoleColor.Red);
                 }
+                man.KeyPressed -= Man_DelKeyPressed;
+                man.delete = false;
             }
-            else if(e.Key == ConsoleKey.T)
+            else if (e.Key == ConsoleKey.N)
             {
-                Report report = new Report();
-                report.DoReport(man.WindowList);
+                man.KeyPressed -= Man_DelKeyPressed;
+                man.delete = false;
             }
         }
+
     }
 }
