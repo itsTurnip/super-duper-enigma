@@ -63,6 +63,11 @@ namespace Terminal
                     man.ShowMessage("Couldn't kill process. Maybe it's system process", ConsoleColor.Red);
                 }
             }
+            else if(e.Key == ConsoleKey.T)
+            {
+                Report report = new Report();
+                report.DoReport(man.WindowList);
+            }
         }
     }
 }
