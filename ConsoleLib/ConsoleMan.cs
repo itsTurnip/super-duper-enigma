@@ -150,34 +150,30 @@ namespace ConsoleLib
 
         private void renderFooter()
         {
-            if (!delete)
+            const string s = "    ";
+            int bottomline = Console.WindowHeight - 1;
+            Console.SetCursorPosition(0, bottomline);
+            Write("Esc");
+            Write("Exit", SelectionForeground, SelectionBackground);
+            Write(s + "Up");
+            Write("Previous", SelectionForeground, SelectionBackground);
+            Write(s + "Down");
+            Write("Next", SelectionForeground, SelectionBackground);
+            Write(s + "Bot");
+            Write($"{visibleBottom}", SelectionForeground, SelectionBackground);
+            Write(s + "Top");
+            Write($"{visibleTop}", SelectionForeground, SelectionBackground);
+            Write(s + "Sel");
+            Write($"{selectedIndex}", SelectionForeground, SelectionBackground);
+            foreach (MenuKeyInfo keyInfo in Keys)
             {
-                const string s = "    ";
-                int bottomline = Console.WindowHeight - 1;
-                Console.SetCursorPosition(0, bottomline);
-                Write("Esc");
-                Write("Exit", SelectionForeground, SelectionBackground);
-                Write(s + "Up");
-                Write("Previous", SelectionForeground, SelectionBackground);
-                Write(s + "Down");
-                Write("Next", SelectionForeground, SelectionBackground);
-                Write(s + "Bot");
-                Write($"{visibleBottom}", SelectionForeground, SelectionBackground);
-                Write(s + "Top");
-                Write($"{visibleTop}", SelectionForeground, SelectionBackground);
-                Write(s + "Sel");
-                Write($"{selectedIndex}", SelectionForeground, SelectionBackground);
-                foreach (MenuKeyInfo keyInfo in Keys)
-                {
-                    Write(s + $"{keyInfo.Key}");
-                    Write($"{keyInfo.Description}", SelectionForeground, SelectionBackground);
-                }
-                var pos = Console.CursorLeft;
-                var width = Console.WindowWidth;
-                if (width > pos)
-                    Write(new string(' ', width - pos - 1));
+                Write(s + $"{keyInfo.Key}");
+                Write($"{keyInfo.Description}", SelectionForeground, SelectionBackground);
             }
-            
+            var pos = Console.CursorLeft;
+            var width = Console.WindowWidth;
+            if (width > pos)
+                Write(new string(' ', width - pos - 1));
         }
 
         public void renderDelFooter(dynamic process)
@@ -248,7 +244,8 @@ namespace ConsoleLib
                 return;
             renderHead();
             renderList();
-            renderFooter();
+            if(!delete)
+                renderFooter();
         }
 
         public void Loop()
