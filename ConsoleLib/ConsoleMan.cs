@@ -14,6 +14,12 @@ namespace ConsoleLib
         Input
     }
 
+    public enum DialogResult
+    {
+        Yes,
+        No
+    }
+
     public class ConsoleMan
     {
         [DllImport("kernel32.dll", SetLastError = true)]
@@ -36,7 +42,6 @@ namespace ConsoleLib
 
         private int selectedIndex = -1;
         private bool stop = false;
-        public bool delete = false;
         public string Title { get; set; } = "Terminal";
         private string message;
         private ConsoleColor messageColor = ConsoleColor.DarkRed;
@@ -57,8 +62,8 @@ namespace ConsoleLib
         public ConsoleColor DefaultBackground { get; set; } = ConsoleColor.Black;
 
         public ConsoleColor DefaultForeground { get; set; } = ConsoleColor.Gray;
-        public List<MenuKeyInfo> Keys { get; } = new List<MenuKeyInfo>();
-        public List<string> Columns { get; } = new List<string>();
+        public List<MenuKeyInfo> Keys { get; private set; } = new List<MenuKeyInfo>();
+        public List<string> Columns { get; private set; } = new List<string>();
         public int SelectedIndex
         {
             get => selectedIndex;
@@ -80,6 +85,12 @@ namespace ConsoleLib
             IntPtr output = GetStdHandle(StdHandle.Output);
             Console.SetIn(new StreamReader(new FileStream(new SafeFileHandle(input, true), FileAccess.Read)));
             Console.SetOut(new StreamWriter(new FileStream(new SafeFileHandle(output, true), FileAccess.Write)) { AutoFlush = true });
+            Keys.AddRange(new MenuKeyInfo[] 
+            { 
+                new MenuKeyInfo() {Key = "Esc", Description = "Exit" },
+                new MenuKeyInfo() {Key = "Up", Description = "Previous"},
+                new MenuKeyInfo() {Key = "Down", Description = "Next"},
+            });
         }
 
         private void WriteLine(object obj, int line = -1, object[] arg = null)
@@ -153,18 +164,12 @@ namespace ConsoleLib
             const string s = "    ";
             int bottomline = Console.WindowHeight - 1;
             Console.SetCursorPosition(0, bottomline);
-            Write("Esc");
-            Write("Exit", SelectionForeground, SelectionBackground);
-            Write(s + "Up");
-            Write("Previous", SelectionForeground, SelectionBackground);
-            Write(s + "Down");
-            Write("Next", SelectionForeground, SelectionBackground);
-            Write(s + "Bot");
-            Write($"{visibleBottom}", SelectionForeground, SelectionBackground);
-            Write(s + "Top");
-            Write($"{visibleTop}", SelectionForeground, SelectionBackground);
-            Write(s + "Sel");
-            Write($"{selectedIndex}", SelectionForeground, SelectionBackground);
+            //Write(s + "Bot");
+            //Write($"{visibleBottom}", SelectionForeground, SelectionBackground);
+            //Write(s + "Top");
+            //Write($"{visibleTop}", SelectionForeground, SelectionBackground);
+            //Write(s + "Sel");
+            //Write($"{selectedIndex}", SelectionForeground, SelectionBackground);
             foreach (MenuKeyInfo keyInfo in Keys)
             {
                 Write(s + $"{keyInfo.Key}");
@@ -174,21 +179,6 @@ namespace ConsoleLib
             var width = Console.WindowWidth;
             if (width > pos)
                 Write(new string(' ', width - pos - 1));
-        }
-
-        public void renderDelFooter(dynamic process)
-        {
-            
-            const string s = "    ";
-            int bottomline = Console.WindowHeight - 1;
-            Console.SetCursorPosition(0, bottomline);
-            Console.Write(new string(' ', Console.WindowWidth));
-            Console.SetCursorPosition(0, bottomline);
-            Write($"Kill {process.Name}?\t");
-            Write("Y");
-            Write("Yes", SelectionForeground, SelectionBackground);
-            Write(s + "N");
-            Write("No", SelectionForeground, SelectionBackground);
         }
 
         private void renderList()
@@ -244,10 +234,49 @@ namespace ConsoleLib
                 return;
             renderHead();
             renderList();
-            if(!delete)
-                renderFooter();
+            renderFooter();
         }
-
+        public DialogResult ShowDialog(string message)
+        { 
+            bool answer = false;
+            var keys = Keys;
+            var columns = Columns;
+            Columns = new List<string>();
+            Keys = new List<MenuKeyInfo>();
+            Keys.AddRange(new MenuKeyInfo[] { new MenuKeyInfo() { Description = "Yes", Key = "Y" }, new MenuKeyInfo() { Description = "No", Key = "N" } });
+            while (true)
+            {
+                if(Console.KeyAvailable)
+                {
+                    ConsoleKeyInfo cki = Console.ReadKey(true);
+                    if (cki.Key == ConsoleKey.Y)
+                    {
+                        answer = true;
+                        break;
+                    }
+                    else if (cki.Key == ConsoleKey.N)
+                    {
+                        break;
+                    }
+                }
+                renderHead();
+                int line = headerHeight + 2;
+                WriteLine("");
+                WriteLine(message);
+                while (line < Console.WindowHeight - 1)
+                {
+                    WriteLine("");
+                    line++;
+                }
+                renderFooter();
+            }
+            Keys = keys;
+            Columns = columns;
+            if (answer)
+                return DialogResult.Yes;
+            else
+                return DialogResult.No;
+        }
         public void Loop()
         {
             visibleBottom = Console.WindowHeight - footerHeight - 1;
@@ -256,23 +285,19 @@ namespace ConsoleLib
                 if (Console.KeyAvailable)
                 {
                     ConsoleKeyInfo cki = Console.ReadKey(true);
-                    if (!delete)
+                    switch (cki.Key)
                     {
-                        switch (cki.Key)
-                        {
-                            case ConsoleKey.Escape:
-                                stop = true;
-                                break;
+                        case ConsoleKey.Escape:
+                            stop = true;
+                            break;
 
-                            case ConsoleKey.DownArrow:
-                                SelectedIndex += 1;
-                                break;
+                        case ConsoleKey.DownArrow:
+                            SelectedIndex += 1;
+                            break;
 
-                            case ConsoleKey.UpArrow:
-                                SelectedIndex -= 1;
-                                break;
-                        }
-                        
+                        case ConsoleKey.UpArrow:
+                            SelectedIndex -= 1;
+                            break;
                     }
                     KeyPressed?.Invoke(new KeyPressedEvent(this, cki.Key));
                 }

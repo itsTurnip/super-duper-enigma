@@ -55,40 +55,24 @@ namespace Terminal
             }
             else if (e.Key == ConsoleKey.K)
             {
-                man.delete = true;
-                man.renderDelFooter(man.SelectedItem);
-                man.KeyPressed += Man_DelKeyPressed;
+                dynamic process = man.SelectedItem;
+                if (man.ShowDialog($"Are you sure want to kill {process.Name}?") == DialogResult.Yes)
+                {
+                    if (dispatcher.Kill(man.SelectedIndex))
+                    {
+                        man.ShowMessage("Success!", ConsoleColor.Green);
+                    }
+                    else
+                    {
+                        man.ShowMessage("Couldn't kill process. Maybe it's system process", ConsoleColor.Red);
+                    }
+                }
             }
-            else if(e.Key == ConsoleKey.T)
+            else if (e.Key == ConsoleKey.T)
             {
                 Report report = new Report();
                 report.DoReport(man.WindowList);
             }
         }
-
-        private static void Man_DelKeyPressed(KeyPressedEvent e)
-        {
-            ConsoleMan man = (ConsoleMan)e.Sender;
-            if (e.Key == ConsoleKey.Y)
-            {
-                if (dispatcher.Kill(man.SelectedIndex))
-                {
-                    man.ShowMessage("Success!", ConsoleColor.Green);
-                    man.SelectedIndex = man.SelectedIndex; // пересчет на случай, если оказались в последней позиции и произошло удаление => отсутствие OutOfRangeException
-                }
-                else
-                {
-                    man.ShowMessage("Couldn't kill process. Maybe it's system process", ConsoleColor.Red);
-                }
-                man.KeyPressed -= Man_DelKeyPressed;
-                man.delete = false;
-            }
-            else if (e.Key == ConsoleKey.N)
-            {
-                man.KeyPressed -= Man_DelKeyPressed;
-                man.delete = false;
-            }
-        }
-
     }
 }
